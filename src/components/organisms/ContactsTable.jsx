@@ -13,7 +13,11 @@ const ContactsTable = ({
   onDeleteContact,
   sortField,
   sortDirection,
-  onSort
+  onSort,
+  selectedContacts = [],
+  onContactSelect,
+  onSelectAll,
+  showBulkActions = false
 }) => {
   const getCompanyName = (companyId) => {
     const company = companies.find(c => c.Id === companyId);
@@ -54,7 +58,15 @@ const ContactsTable = ({
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
-            <tr>
+<tr>
+              <th className="px-6 py-3 text-left">
+                <input
+                  type="checkbox"
+                  checked={selectedContacts.length === contacts.length && contacts.length > 0}
+                  onChange={(e) => onSelectAll(e.target.checked)}
+                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                />
+              </th>
               <th 
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors duration-200"
                 onClick={() => handleSort("firstName")}
@@ -110,12 +122,22 @@ const ContactsTable = ({
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {contacts.map((contact) => (
-              <tr 
+<tr 
                 key={contact.Id} 
-                className="table-row hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 cursor-pointer"
-                onClick={() => onContactClick(contact)}
+                className="table-row hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100"
               >
-                <td className="px-6 py-4 whitespace-nowrap">
+<td className="px-6 py-4 whitespace-nowrap">
+                  <input
+                    type="checkbox"
+                    checked={selectedContacts.includes(contact.Id)}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      onContactSelect(contact.Id, e.target.checked);
+                    }}
+                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                  />
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap cursor-pointer" onClick={() => onContactClick(contact)}>
                   <div className="flex items-center">
                     <div className="w-10 h-10 bg-gradient-to-r from-primary-400 to-secondary-400 rounded-full flex items-center justify-center">
                       <span className="text-sm font-medium text-white">

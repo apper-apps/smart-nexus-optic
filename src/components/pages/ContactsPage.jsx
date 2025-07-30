@@ -14,7 +14,7 @@ import * as companyService from "@/services/api/companyService";
 import * as activityService from "@/services/api/activityService";
 
 const ContactsPage = ({ onMobileMenuToggle }) => {
-  const [contacts, setContacts] = useState([]);
+const [contacts, setContacts] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [activities, setActivities] = useState([]);
   const [filteredContacts, setFilteredContacts] = useState([]);
@@ -38,6 +38,9 @@ const ContactsPage = ({ onMobileMenuToggle }) => {
   const [sortField, setSortField] = useState("firstName");
   const [sortDirection, setSortDirection] = useState("asc");
 
+  // Bulk selection states
+  const [selectedContacts, setSelectedContacts] = useState([]);
+  const [showBulkActions, setShowBulkActions] = useState(false);
   // Load data
   const loadData = async () => {
     setLoading(true);
@@ -118,7 +121,7 @@ const ContactsPage = ({ onMobileMenuToggle }) => {
   }, [contacts, searchQuery, filters, sortField, sortDirection, companies]);
 
   // Event handlers
-  const handleSearchChange = (e) => {
+const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
 
@@ -191,6 +194,65 @@ const ContactsPage = ({ onMobileMenuToggle }) => {
     setShowContactForm(true);
   };
 
+  // Bulk selection handlers
+  const handleContactSelect = (contactId, isSelected) => {
+    setSelectedContacts(prev => {
+      const newSelection = isSelected 
+        ? [...prev, contactId]
+        : prev.filter(id => id !== contactId);
+      
+      setShowBulkActions(newSelection.length > 0);
+      return newSelection;
+    });
+  };
+
+  const handleSelectAll = (selectAll) => {
+    if (selectAll) {
+      const allContactIds = filteredContacts.map(contact => contact.Id);
+      setSelectedContacts(allContactIds);
+      setShowBulkActions(true);
+    } else {
+      setSelectedContacts([]);
+      setShowBulkActions(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (!window.confirm(`Are you sure you want to delete ${selectedContacts.length} contacts? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      await contactService.bulkDelete(selectedContacts);
+      setContacts(contacts.filter(c => !selectedContacts.includes(c.Id)));
+      setSelectedContacts([]);
+      setShowBulkActions(false);
+      toast.success(`${selectedContacts.length} contacts deleted successfully!`);
+    } catch (error) {
+      toast.error("Failed to delete contacts. Please try again.");
+    }
+  };
+
+  const handleBulkLifecycleUpdate = async (lifecycleStage) => {
+    if (!lifecycleStage) return;
+
+    if (!window.confirm(`Are you sure you want to update ${selectedContacts.length} contacts to "${lifecycleStage}" stage?`)) {
+      return;
+    }
+
+    try {
+      const updatedContacts = await contactService.bulkUpdateLifecycleStage(selectedContacts, lifecycleStage);
+      setContacts(contacts.map(contact => {
+        const updated = updatedContacts.find(uc => uc.Id === contact.Id);
+        return updated || contact;
+      }));
+      setSelectedContacts([]);
+      setShowBulkActions(false);
+      toast.success(`${selectedContacts.length} contacts updated to "${lifecycleStage}" stage!`);
+    } catch (error) {
+      toast.error("Failed to update contacts. Please try again.");
+    }
+  };
   if (loading) {
     return (
       <div className="flex-1 flex flex-col">
@@ -252,12 +314,59 @@ const ContactsPage = ({ onMobileMenuToggle }) => {
         />
 
         {/* Results Summary */}
-        <div className="flex items-center justify-between">
+<div className="flex items-center justify-between">
           <p className="text-sm text-gray-600">
             Showing {filteredContacts.length} of {contacts.length} contacts
+            {selectedContacts.length > 0 && (
+              <span className="ml-2 font-medium text-primary-600">
+                ({selectedContacts.length} selected)
+              </span>
+            )}
           </p>
+          
+          {showBulkActions && (
+            <div className="flex items-center space-x-3 bg-primary-50 border border-primary-200 rounded-lg px-4 py-2">
+              <span className="text-sm font-medium text-primary-700">
+                {selectedContacts.length} contact{selectedContacts.length !== 1 ? 's' : ''} selected
+              </span>
+              
+              <div className="flex items-center space-x-2">
+                <select
+                  onChange={(e) => handleBulkLifecycleUpdate(e.target.value)}
+                  className="text-xs px-2 py-1 border border-primary-300 rounded focus:ring-primary-500 focus:border-primary-500"
+                  defaultValue=""
+                >
+                  <option value="">Update Stage</option>
+                  <option value="lead">Lead</option>
+                  <option value="prospect">Prospect</option>
+                  <option value="customer">Customer</option>
+                  <option value="evangelist">Evangelist</option>
+                </select>
+                
+                <ActionButton
+                  icon="Trash2"
+                  variant="danger"
+                  size="sm"
+                  onClick={handleBulkDelete}
+                >
+                  Delete
+                </ActionButton>
+                
+                <ActionButton
+                  icon="X"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setSelectedContacts([]);
+                    setShowBulkActions(false);
+                  }}
+                >
+                  Cancel
+                </ActionButton>
+              </div>
+            </div>
+          )}
         </div>
-
         {/* Content */}
         {filteredContacts.length === 0 && !searchQuery && Object.values(filters).every(f => !f) ? (
           <Empty
@@ -276,7 +385,7 @@ const ContactsPage = ({ onMobileMenuToggle }) => {
             icon="Search"
           />
         ) : (
-          <ContactsTable
+<ContactsTable
             contacts={filteredContacts}
             companies={companies}
             onContactClick={handleContactClick}
@@ -285,6 +394,10 @@ const ContactsPage = ({ onMobileMenuToggle }) => {
             sortField={sortField}
             sortDirection={sortDirection}
             onSort={handleSort}
+            selectedContacts={selectedContacts}
+            onContactSelect={handleContactSelect}
+            onSelectAll={handleSelectAll}
+            showBulkActions={showBulkActions}
           />
         )}
       </div>

@@ -63,6 +63,58 @@ export const delete_ = async (id) => {
   }
   
   contacts.splice(index, 1);
+return true;
+};
+
+// Bulk delete multiple contacts
+export const bulkDelete = async (contactIds) => {
+  await delay(500); // Simulate API delay
+  
+  // Validate all contact IDs exist
+  for (const id of contactIds) {
+    const contact = contacts.find(c => c.Id === id);
+    if (!contact) {
+      throw new Error(`Contact with ID ${id} not found`);
+    }
+  }
+  
+  // Remove all contacts from the array
+  contactIds.forEach(id => {
+    const index = contacts.findIndex(c => c.Id === id);
+    if (index !== -1) {
+      contacts.splice(index, 1);
+    }
+  });
+  
   return true;
+};
+
+// Bulk update lifecycle stage for multiple contacts
+export const bulkUpdateLifecycleStage = async (contactIds, lifecycleStage) => {
+  await delay(500); // Simulate API delay
+  
+  const validStages = ['lead', 'prospect', 'customer', 'evangelist'];
+  if (!validStages.includes(lifecycleStage)) {
+    throw new Error('Invalid lifecycle stage');
+  }
+  
+  const updatedContacts = [];
+  
+  for (const id of contactIds) {
+    const contactIndex = contacts.findIndex(c => c.Id === id);
+    if (contactIndex === -1) {
+      throw new Error(`Contact with ID ${id} not found`);
+    }
+    
+    contacts[contactIndex] = {
+      ...contacts[contactIndex],
+      lifecycleStage,
+      updatedAt: new Date().toISOString()
+    };
+    
+    updatedContacts.push(contacts[contactIndex]);
+  }
+  
+  return updatedContacts;
 };
 // Export delete_ function (delete is a reserved keyword)
