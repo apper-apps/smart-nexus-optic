@@ -31,7 +31,8 @@ export const create = async (activityData) => {
   const newActivity = {
     ...activityData,
     Id: maxId + 1,
-    contactId: parseInt(activityData.contactId),
+    contactId: activityData.contactId ? parseInt(activityData.contactId) : null,
+    dealId: activityData.dealId ? parseInt(activityData.dealId) : null,
     timestamp: new Date().toISOString()
   };
   
@@ -50,11 +51,18 @@ export const update = async (id, activityData) => {
   const updatedActivity = {
     ...activities[index],
     ...activityData,
-    contactId: parseInt(activityData.contactId)
+    contactId: activityData.contactId ? parseInt(activityData.contactId) : activities[index].contactId,
+    dealId: activityData.dealId ? parseInt(activityData.dealId) : activities[index].dealId
   };
   
   activities[index] = updatedActivity;
   return { ...updatedActivity };
+};
+
+export const getByDealId = async (dealId) => {
+  await delay(200);
+  return activities.filter(activity => activity.dealId === parseInt(dealId))
+    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 };
 
 export const delete_ = async (id) => {

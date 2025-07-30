@@ -4,7 +4,6 @@ import ApperIcon from "@/components/ApperIcon";
 import Card from "@/components/atoms/Card";
 import Button from "@/components/atoms/Button";
 import LifecycleBadge from "@/components/molecules/LifecycleBadge";
-
 const ContactModal = ({ contact, companies = [], activities = [], onClose, onEdit }) => {
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -174,35 +173,84 @@ const ContactModal = ({ contact, companies = [], activities = [], onClose, onEdi
               </div>
             )}
 
-            {activeTab === "activity" && (
+{activeTab === "activity" && (
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Recent Activity</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-6">Activity Timeline</h3>
                 {contactActivities.length > 0 ? (
                   <div className="space-y-4">
-                    {contactActivities.map((activity) => (
-                      <Card key={activity.Id} className="p-4">
-                        <div className="flex items-start space-x-3">
-                          <div className="w-8 h-8 bg-gradient-to-r from-info-400 to-info-500 rounded-full flex items-center justify-center">
-                            <ApperIcon name="Activity" className="h-4 w-4 text-white" />
+                    {contactActivities
+                      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+                      .map((activity, index) => {
+                        const getActivityIcon = (type) => {
+                          switch (type) {
+                            case 'email': return 'Mail';
+                            case 'call': return 'Phone';
+                            case 'meeting': return 'Calendar';
+                            case 'note': return 'FileText';
+                            case 'download': return 'Download';
+                            case 'referral': return 'Users';
+                            case 'support': return 'HelpCircle';
+                            case 'training': return 'BookOpen';
+                            case 'webinar': return 'Video';
+                            default: return 'Activity';
+                          }
+                        };
+
+                        const getActivityColor = (type) => {
+                          switch (type) {
+                            case 'email': return 'from-info-400 to-info-500';
+                            case 'call': return 'from-success-400 to-success-500';
+                            case 'meeting': return 'from-accent-400 to-accent-500';
+                            case 'note': return 'from-gray-400 to-gray-500';
+                            case 'download': return 'from-warning-400 to-warning-500';
+                            case 'referral': return 'from-secondary-400 to-secondary-500';
+                            case 'support': return 'from-error-400 to-error-500';
+                            case 'training': return 'from-primary-400 to-primary-500';
+                            case 'webinar': return 'from-info-400 to-info-500';
+                            default: return 'from-gray-400 to-gray-500';
+                          }
+                        };
+
+                        return (
+                          <div key={activity.Id} className="relative">
+                            {index < contactActivities.length - 1 && (
+                              <div className="absolute left-6 top-12 w-0.5 h-6 bg-gray-200" />
+                            )}
+                            <Card className="p-4 hover:shadow-md transition-shadow duration-200">
+                              <div className="flex items-start space-x-4">
+                                <div className={`w-12 h-12 bg-gradient-to-r ${getActivityColor(activity.type)} rounded-full flex items-center justify-center flex-shrink-0`}>
+                                  <ApperIcon name={getActivityIcon(activity.type)} className="h-5 w-5 text-white" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <h4 className="text-sm font-semibold text-gray-900 capitalize">
+                                      {activity.type.replace(/([A-Z])/g, ' $1').trim()}
+                                    </h4>
+                                    <time className="text-xs text-gray-500 font-medium">
+                                      {format(new Date(activity.timestamp), "MMM d, yyyy 'at' h:mm a")}
+                                    </time>
+                                  </div>
+                                  <p className="text-sm text-gray-700 leading-relaxed">{activity.description}</p>
+                                </div>
+                              </div>
+                            </Card>
                           </div>
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between">
-                              <h4 className="text-sm font-medium text-gray-900 capitalize">{activity.type}</h4>
-                              <span className="text-xs text-gray-500">
-                                {format(new Date(activity.timestamp), "MMM d, yyyy 'at' h:mm a")}
-                              </span>
-                            </div>
-                            <p className="text-sm text-gray-600 mt-1">{activity.description}</p>
-                          </div>
-                        </div>
-                      </Card>
-                    ))}
+                        );
+                      })}
                   </div>
                 ) : (
-                  <Card className="p-8 text-center">
-                    <ApperIcon name="Activity" className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">No activity yet</h4>
-                    <p className="text-sm text-gray-500">Activities will appear here as you interact with this contact.</p>
+                  <Card className="p-8 text-center bg-gradient-to-br from-gray-50 to-gray-100">
+                    <div className="w-16 h-16 bg-gradient-to-r from-gray-300 to-gray-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <ApperIcon name="Activity" className="h-8 w-8 text-white" />
+                    </div>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-2">No Activity Yet</h4>
+                    <p className="text-sm text-gray-600 mb-4">Start tracking interactions with this contact to see their activity timeline here.</p>
+                    <div className="flex flex-wrap justify-center gap-2 text-xs text-gray-500">
+                      <span className="px-2 py-1 bg-white rounded-full">Calls</span>
+                      <span className="px-2 py-1 bg-white rounded-full">Emails</span>
+                      <span className="px-2 py-1 bg-white rounded-full">Meetings</span>
+                      <span className="px-2 py-1 bg-white rounded-full">Notes</span>
+                    </div>
                   </Card>
                 )}
               </div>

@@ -3,7 +3,6 @@ import { format } from "date-fns";
 import ApperIcon from "@/components/ApperIcon";
 import Card from "@/components/atoms/Card";
 import Button from "@/components/atoms/Button";
-
 const DealModal = ({ 
   deal, 
   contact, 
@@ -226,28 +225,87 @@ const DealModal = ({
             </div>
           )}
 
-          {activeTab === 'activity' && (
+{activeTab === 'activity' && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activities</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">Activity Timeline</h3>
               {dealActivities.length > 0 ? (
                 <div className="space-y-4">
-                  {dealActivities.map((activity) => (
-                    <div key={activity.Id} className="border-l-4 border-primary-200 pl-4 py-2">
-                      <div className="flex items-center justify-between">
-                        <h4 className="font-medium text-gray-900">{activity.title}</h4>
-                        <span className="text-sm text-gray-500">
-                          {format(new Date(activity.date), 'MMM dd, yyyy')}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600 mt-1">{activity.description}</p>
-                    </div>
-                  ))}
+                  {dealActivities
+                    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+                    .map((activity, index) => {
+                      const getActivityIcon = (type) => {
+                        switch (type) {
+                          case 'email': return 'Mail';
+                          case 'call': return 'Phone';
+                          case 'meeting': return 'Calendar';
+                          case 'note': return 'FileText';
+                          case 'proposal': return 'FileText';
+                          case 'contract': return 'File';
+                          case 'negotiation': return 'MessageSquare';
+                          case 'demo': return 'Play';
+                          case 'followup': return 'RefreshCw';
+                          default: return 'Activity';
+                        }
+                      };
+
+                      const getActivityColor = (type) => {
+                        switch (type) {
+                          case 'email': return 'from-info-400 to-info-500';
+                          case 'call': return 'from-success-400 to-success-500';
+                          case 'meeting': return 'from-accent-400 to-accent-500';
+                          case 'note': return 'from-gray-400 to-gray-500';
+                          case 'proposal': return 'from-warning-400 to-warning-500';
+                          case 'contract': return 'from-primary-400 to-primary-500';
+                          case 'negotiation': return 'from-secondary-400 to-secondary-500';
+                          case 'demo': return 'from-accent-400 to-accent-500';
+                          case 'followup': return 'from-info-400 to-info-500';
+                          default: return 'from-gray-400 to-gray-500';
+                        }
+                      };
+
+                      return (
+                        <div key={activity.Id} className="relative">
+                          {index < dealActivities.length - 1 && (
+                            <div className="absolute left-6 top-14 w-0.5 h-6 bg-gray-200" />
+                          )}
+                          <Card className="p-5 hover:shadow-lg transition-all duration-200">
+                            <div className="flex items-start space-x-4">
+                              <div className={`w-12 h-12 bg-gradient-to-r ${getActivityColor(activity.type)} rounded-full flex items-center justify-center flex-shrink-0 shadow-sm`}>
+                                <ApperIcon name={getActivityIcon(activity.type)} className="h-5 w-5 text-white" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between mb-2">
+                                  <h4 className="text-base font-semibold text-gray-900 capitalize">
+                                    {activity.type.replace(/([A-Z])/g, ' $1').trim()}
+                                  </h4>
+                                  <time className="text-sm text-gray-500 font-medium">
+                                    {format(new Date(activity.timestamp), "MMM d, yyyy 'at' h:mm a")}
+                                  </time>
+                                </div>
+                                <p className="text-sm text-gray-700 leading-relaxed">{activity.description}</p>
+                              </div>
+                            </div>
+                          </Card>
+                        </div>
+                      );
+                    })}
                 </div>
               ) : (
-                <div className="text-center py-8">
-                  <ApperIcon name="Activity" className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">No activities recorded yet</p>
-                </div>
+                <Card className="p-10 text-center bg-gradient-to-br from-gray-50 to-gray-100">
+                  <div className="w-20 h-20 bg-gradient-to-r from-gray-300 to-gray-400 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <ApperIcon name="Activity" className="h-10 w-10 text-white" />
+                  </div>
+                  <h4 className="text-xl font-semibold text-gray-900 mb-3">No Deal Activity Yet</h4>
+                  <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                    Track calls, meetings, emails, and other interactions related to this deal to build a comprehensive activity timeline.
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-3 text-sm text-gray-500">
+                    <span className="px-3 py-2 bg-white rounded-lg shadow-sm">Calls</span>
+                    <span className="px-3 py-2 bg-white rounded-lg shadow-sm">Meetings</span>
+                    <span className="px-3 py-2 bg-white rounded-lg shadow-sm">Proposals</span>
+                    <span className="px-3 py-2 bg-white rounded-lg shadow-sm">Negotiations</span>
+                  </div>
+                </Card>
               )}
             </div>
           )}
