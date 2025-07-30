@@ -99,3 +99,102 @@ export const getContactLifecycleStats = async () => {
     percentage: ((count / contacts.length) * 100).toFixed(1)
   }));
 };
+
+// Get lead source statistics
+export const getLeadSourceStats = async () => {
+  await delay(200);
+  const contacts = await getAllContacts();
+  
+  const leadSources = contacts.reduce((acc, contact) => {
+    const source = contact.source || 'Unknown';
+    acc[source] = (acc[source] || 0) + 1;
+    return acc;
+  }, {});
+  
+  return Object.entries(leadSources).map(([source, count]) => ({
+    source,
+    count,
+    percentage: ((count / contacts.length) * 100).toFixed(1)
+  }));
+};
+
+// Get sales rep performance
+export const getSalesRepPerformance = async () => {
+  await delay(200);
+  const deals = await getAllDeals();
+  
+  const repPerformance = deals.reduce((acc, deal) => {
+    const rep = deal.assignedTo || 'Unassigned';
+    if (!acc[rep]) {
+      acc[rep] = {
+        name: rep,
+        totalDeals: 0,
+        closedDeals: 0,
+        revenue: 0,
+        pipelineValue: 0
+      };
+    }
+    
+    acc[rep].totalDeals++;
+    if (deal.stage === DEAL_STAGES.CLOSED_WON) {
+      acc[rep].closedDeals++;
+      acc[rep].revenue += deal.value;
+    } else if (deal.stage !== DEAL_STAGES.CLOSED_LOST) {
+      acc[rep].pipelineValue += deal.value;
+    }
+    
+    return acc;
+  }, {});
+  
+  return Object.values(repPerformance)
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 8); // Top 8 performers
+};
+
+// Get campaign performance from campaign service
+export const getCampaignPerformance = async () => {
+  await delay(200);
+  
+  try {
+    // Import campaign service dynamically to avoid circular imports
+    const { campaignService } = await import('./campaignService');
+    const campaigns = await campaignService.getAll();
+    
+    const totalCampaigns = campaigns.length;
+    const activeCampaigns = campaigns.filter(c => c.status === 'active').length;
+    const draftCampaigns = campaigns.filter(c => c.status === 'draft').length;
+    const sentCampaigns = campaigns.filter(c => c.status === 'sent').length;
+    
+    const totalSent = campaigns.reduce((sum, c) => sum + c.sent, 0);
+    const totalOpened = campaigns.reduce((sum, c) => sum + c.opened, 0);
+    const totalClicked = campaigns.reduce((sum, c) => sum + c.clicked, 0);
+    
+    const avgOpenRate = totalSent > 0 ? Math.round(((totalOpened / totalSent) * 100) * 10) / 10 : 0;
+    const avgClickRate = totalSent > 0 ? Math.round(((totalClicked / totalSent) * 100) * 10) / 10 : 0;
+    
+    return {
+      totalCampaigns,
+      activeCampaigns,
+      draftCampaigns,
+      sentCampaigns,
+      totalSent,
+      totalOpened,
+      totalClicked,
+      avgOpenRate,
+      avgClickRate
+    };
+  } catch (error) {
+    console.error('Failed to load campaign performance:', error);
+    return {
+      totalCampaigns: 0,
+      activeCampaigns: 0,
+      draftCampaigns: 0,
+      sentCampaigns: 0,
+      totalSent: 0,
+      totalOpened: 0,
+      totalClicked: 0,
+      avgOpenRate: 0,
+      avgClickRate: 0
+    };
+  }
+};
