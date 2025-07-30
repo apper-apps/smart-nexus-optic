@@ -23,7 +23,7 @@ export const campaignService = {
     return Promise.resolve({ ...campaign });
   },
 
-  create: (campaignData) => {
+create: (campaignData) => {
     const newCampaign = {
       ...campaignData,
       Id: nextId++,
@@ -36,7 +36,15 @@ export const campaignService = {
       clickRate: 0,
       conversionRate: 0,
       createdAt: new Date().toISOString(),
-      lastSent: null
+      lastSent: null,
+      emailContent: campaignData.emailContent || {
+        blocks: [],
+        settings: {
+          backgroundColor: '#ffffff',
+          contentWidth: 600,
+          padding: 20
+        }
+      }
     };
     
     campaigns.push(newCampaign);
@@ -44,7 +52,7 @@ export const campaignService = {
     return Promise.resolve({ ...newCampaign });
   },
 
-  update: (id, campaignData) => {
+update: (id, campaignData) => {
     const numericId = parseInt(id);
     if (isNaN(numericId)) {
       return Promise.reject(new Error('Invalid campaign ID'));
@@ -58,7 +66,15 @@ export const campaignService = {
     campaigns[index] = {
       ...campaigns[index],
       ...campaignData,
-      Id: numericId // Ensure ID doesn't change
+      Id: numericId, // Ensure ID doesn't change
+      emailContent: campaignData.emailContent || campaigns[index].emailContent || {
+        blocks: [],
+        settings: {
+          backgroundColor: '#ffffff',
+          contentWidth: 600,
+          padding: 20
+        }
+      }
     };
 
     toast.success('Campaign updated successfully!');

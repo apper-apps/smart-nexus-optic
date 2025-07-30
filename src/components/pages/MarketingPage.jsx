@@ -6,6 +6,7 @@ import Button from "@/components/atoms/Button";
 import Input from "@/components/atoms/Input";
 import Select from "@/components/atoms/Select";
 import Badge from "@/components/atoms/Badge";
+import EmailBuilder from "@/components/organisms/EmailBuilder";
 import { campaignService } from "@/services/api/campaignService";
 import { toast } from 'react-toastify';
 import { format } from 'date-fns';
@@ -29,12 +30,21 @@ function MarketingPage({ onMobileMenuToggle }) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState(null);
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
     name: '',
     subject: '',
     type: 'broadcast',
-    status: 'draft'
+    status: 'draft',
+    emailContent: {
+      blocks: [],
+      settings: {
+        backgroundColor: '#ffffff',
+        contentWidth: 600,
+        padding: 20
+      }
+    }
   });
+  const [showEmailBuilder, setShowEmailBuilder] = useState(false);
 
   useEffect(() => {
     loadCampaigns();
@@ -79,13 +89,21 @@ function MarketingPage({ onMobileMenuToggle }) {
     }
   };
 
-  const handleEditCampaign = (campaign) => {
+const handleEditCampaign = (campaign) => {
     setEditingCampaign(campaign);
     setFormData({
       name: campaign.name,
       subject: campaign.subject,
       type: campaign.type,
-      status: campaign.status
+      status: campaign.status,
+      emailContent: campaign.emailContent || {
+        blocks: [],
+        settings: {
+          backgroundColor: '#ffffff',
+          contentWidth: 600,
+          padding: 20
+        }
+      }
     });
     setShowEditModal(true);
   };
@@ -124,7 +142,7 @@ function MarketingPage({ onMobileMenuToggle }) {
     }
   };
 
-  const handleSubmit = async () => {
+const handleSubmit = async () => {
     try {
       if (showCreateModal) {
         await campaignService.create(formData);
@@ -139,15 +157,34 @@ function MarketingPage({ onMobileMenuToggle }) {
     }
   };
 
-  const handleCloseModal = () => {
+  const handleOpenEmailBuilder = () => {
+    setShowEmailBuilder(true);
+  };
+
+  const handleEmailContentSave = (emailContent) => {
+    setFormData({ ...formData, emailContent });
+    setShowEmailBuilder(false);
+    toast.success('Email design saved successfully!');
+  };
+
+const handleCloseModal = () => {
     setShowCreateModal(false);
     setShowEditModal(false);
     setEditingCampaign(null);
+    setShowEmailBuilder(false);
     setFormData({
       name: '',
       subject: '',
       type: 'broadcast',
-      status: 'draft'
+      status: 'draft',
+      emailContent: {
+        blocks: [],
+        settings: {
+          backgroundColor: '#ffffff',
+          contentWidth: 600,
+          padding: 20
+        }
+      }
     });
   };
 
@@ -215,7 +252,7 @@ function MarketingPage({ onMobileMenuToggle }) {
         <Card className="p-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <h2 className="text-xl font-bold text-gray-900">Email Campaigns</h2>
-            <Button 
+<Button 
               onClick={() => setShowCreateModal(true)}
               className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white"
             >
@@ -368,8 +405,8 @@ function MarketingPage({ onMobileMenuToggle }) {
           )}
         </Card>
 
-        {/* Create/Edit Campaign Modal */}
-        {(showCreateModal || showEditModal) && (
+{/* Create/Edit Campaign Modal */}
+        {(showCreateModal || showEditModal) && !showEmailBuilder && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <div className="p-6 border-b border-gray-200">
@@ -431,6 +468,30 @@ function MarketingPage({ onMobileMenuToggle }) {
                     </Select>
                   </div>
                 </div>
+                
+                {/* Email Design Section */}
+                <div className="border-t border-gray-200 pt-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Email Design
+                      </label>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {formData.emailContent.blocks.length > 0 
+                          ? `${formData.emailContent.blocks.length} blocks configured`
+                          : 'No email design created yet'
+                        }
+                      </p>
+                    </div>
+                    <Button
+                      onClick={handleOpenEmailBuilder}
+                      className="bg-gradient-to-r from-secondary-500 to-secondary-600 hover:from-secondary-600 hover:to-secondary-700 text-white"
+                    >
+                      <ApperIcon name="Mail" size={16} className="mr-2" />
+                      Design Email
+                    </Button>
+                  </div>
+                </div>
               </div>
               <div className="p-6 border-t border-gray-200 flex justify-end space-x-4">
                 <Button
@@ -449,6 +510,16 @@ function MarketingPage({ onMobileMenuToggle }) {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Email Builder Modal */}
+        {showEmailBuilder && (
+          <EmailBuilder
+            emailContent={formData.emailContent}
+            onSave={handleEmailContentSave}
+            onClose={() => setShowEmailBuilder(false)}
+          />
+        )}
         )}
       </div>
     </div>
