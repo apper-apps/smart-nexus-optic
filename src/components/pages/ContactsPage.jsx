@@ -1,0 +1,321 @@
+import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
+import Header from "@/components/organisms/Header";
+import ContactsTable from "@/components/organisms/ContactsTable";
+import ContactModal from "@/components/organisms/ContactModal";
+import ContactForm from "@/components/organisms/ContactForm";
+import ContactFilters from "@/components/organisms/ContactFilters";
+import ActionButton from "@/components/molecules/ActionButton";
+import Loading from "@/components/ui/Loading";
+import Error from "@/components/ui/Error";
+import Empty from "@/components/ui/Empty";
+import * as contactService from "@/services/api/contactService";
+import * as companyService from "@/services/api/companyService";
+import * as activityService from "@/services/api/activityService";
+
+const ContactsPage = ({ onMobileMenuToggle }) => {
+  const [contacts, setContacts] = useState([]);
+  const [companies, setCompanies] = useState([]);
+  const [activities, setActivities] = useState([]);
+  const [filteredContacts, setFilteredContacts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // Modal states
+  const [selectedContact, setSelectedContact] = useState(null);
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [showContactForm, setShowContactForm] = useState(false);
+  const [editingContact, setEditingContact] = useState(null);
+
+  // Filter and search states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState({
+    lifecycleStage: "",
+    companyId: ""
+  });
+
+  // Sorting states
+  const [sortField, setSortField] = useState("firstName");
+  const [sortDirection, setSortDirection] = useState("asc");
+
+  // Load data
+  const loadData = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const [contactsData, companiesData, activitiesData] = await Promise.all([
+        contactService.getAll(),
+        companyService.getAll(),
+        activityService.getAll()
+      ]);
+      
+      setContacts(contactsData);
+      setCompanies(companiesData);
+      setActivities(activitiesData);
+    } catch (err) {
+      setError("Failed to load contacts. Please try again.");
+      console.error("Error loading data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  // Filter and search logic
+  useEffect(() => {
+    let filtered = [...contacts];
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(contact => 
+        `${contact.firstName} ${contact.lastName}`.toLowerCase().includes(query) ||
+        contact.email.toLowerCase().includes(query) ||
+        contact.phone.includes(query)
+      );
+    }
+
+    // Apply lifecycle stage filter
+    if (filters.lifecycleStage) {
+      filtered = filtered.filter(contact => contact.lifecycleStage === filters.lifecycleStage);
+    }
+
+    // Apply company filter
+    if (filters.companyId) {
+      filtered = filtered.filter(contact => contact.companyId === parseInt(filters.companyId));
+    }
+
+    // Apply sorting
+    filtered.sort((a, b) => {
+      let aValue = a[sortField];
+      let bValue = b[sortField];
+
+      if (sortField === "companyId") {
+        const aCompany = companies.find(c => c.Id === a.companyId)?.name || "";
+        const bCompany = companies.find(c => c.Id === b.companyId)?.name || "";
+        aValue = aCompany.toLowerCase();
+        bValue = bCompany.toLowerCase();
+      } else if (sortField === "firstName") {
+        aValue = `${a.firstName} ${a.lastName}`.toLowerCase();
+        bValue = `${b.firstName} ${b.lastName}`.toLowerCase();
+      } else if (typeof aValue === "string") {
+        aValue = aValue.toLowerCase();
+        bValue = bValue.toLowerCase();
+      }
+
+      if (sortDirection === "asc") {
+        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+      } else {
+        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+      }
+    });
+
+    setFilteredContacts(filtered);
+  }, [contacts, searchQuery, filters, sortField, sortDirection, companies]);
+
+  // Event handlers
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleFilterChange = (filterName, value) => {
+    setFilters(prev => ({
+      ...prev,
+      [filterName]: value
+    }));
+  };
+
+  const handleClearFilters = () => {
+    setFilters({
+      lifecycleStage: "",
+      companyId: ""
+    });
+    setSearchQuery("");
+  };
+
+  const handleSort = (field, direction) => {
+    setSortField(field);
+    setSortDirection(direction);
+  };
+
+  const handleContactClick = (contact) => {
+    setSelectedContact(contact);
+    setShowContactModal(true);
+  };
+
+  const handleEditContact = (contact) => {
+    setEditingContact(contact);
+    setShowContactForm(true);
+    setShowContactModal(false);
+  };
+
+  const handleDeleteContact = async (contactId) => {
+    if (!window.confirm("Are you sure you want to delete this contact?")) {
+      return;
+    }
+
+    try {
+      await contactService.delete(contactId);
+      setContacts(contacts.filter(c => c.Id !== contactId));
+      toast.success("Contact deleted successfully!");
+    } catch (error) {
+      toast.error("Failed to delete contact. Please try again.");
+    }
+  };
+
+  const handleSaveContact = async (formData) => {
+    try {
+      let updatedContact;
+
+      if (editingContact) {
+        updatedContact = await contactService.update(editingContact.Id, formData);
+        setContacts(contacts.map(c => c.Id === editingContact.Id ? updatedContact : c));
+      } else {
+        updatedContact = await contactService.create(formData);
+        setContacts([...contacts, updatedContact]);
+      }
+
+      setShowContactForm(false);
+      setEditingContact(null);
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const handleCreateContact = () => {
+    setEditingContact(null);
+    setShowContactForm(true);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex flex-col">
+        <Header 
+          title="Contacts" 
+          onMobileMenuToggle={onMobileMenuToggle}
+          showSearch={false}
+        />
+        <div className="flex-1 p-6">
+          <Loading type="table" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex-1 flex flex-col">
+        <Header 
+          title="Contacts" 
+          onMobileMenuToggle={onMobileMenuToggle}
+          showSearch={false}
+        />
+        <div className="flex-1 p-6">
+          <Error 
+            title="Failed to load contacts"
+            message={error}
+            onRetry={loadData}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex-1 flex flex-col">
+      <Header 
+        title="Contacts" 
+        searchValue={searchQuery}
+        onSearchChange={handleSearchChange}
+        onMobileMenuToggle={onMobileMenuToggle}
+      >
+        <ActionButton
+          icon="Plus"
+          variant="primary"
+          onClick={handleCreateContact}
+        >
+          Add Contact
+        </ActionButton>
+      </Header>
+
+      <div className="flex-1 p-6 space-y-6">
+        {/* Filters */}
+        <ContactFilters
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onClearFilters={handleClearFilters}
+          companies={companies}
+        />
+
+        {/* Results Summary */}
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-gray-600">
+            Showing {filteredContacts.length} of {contacts.length} contacts
+          </p>
+        </div>
+
+        {/* Content */}
+        {filteredContacts.length === 0 && !searchQuery && Object.values(filters).every(f => !f) ? (
+          <Empty
+            title="No contacts yet"
+            message="Get started by adding your first contact to the system."
+            actionLabel="Add First Contact"
+            onAction={handleCreateContact}
+            icon="Users"
+          />
+        ) : filteredContacts.length === 0 ? (
+          <Empty
+            title="No contacts found"
+            message="Try adjusting your search criteria or filters."
+            actionLabel="Clear Filters"
+            onAction={handleClearFilters}
+            icon="Search"
+          />
+        ) : (
+          <ContactsTable
+            contacts={filteredContacts}
+            companies={companies}
+            onContactClick={handleContactClick}
+            onEditContact={handleEditContact}
+            onDeleteContact={handleDeleteContact}
+            sortField={sortField}
+            sortDirection={sortDirection}
+            onSort={handleSort}
+          />
+        )}
+      </div>
+
+      {/* Modals */}
+      {showContactModal && selectedContact && (
+        <ContactModal
+          contact={selectedContact}
+          companies={companies}
+          activities={activities}
+          onClose={() => {
+            setShowContactModal(false);
+            setSelectedContact(null);
+          }}
+          onEdit={handleEditContact}
+        />
+      )}
+
+      {showContactForm && (
+        <ContactForm
+          contact={editingContact}
+          companies={companies}
+          onSave={handleSaveContact}
+          onClose={() => {
+            setShowContactForm(false);
+            setEditingContact(null);
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
+export default ContactsPage;

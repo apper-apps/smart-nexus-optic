@@ -1,0 +1,107 @@
+[
+  {
+    "Id": 1,
+    "contactId": 1,
+    "type": "email",
+    "description": "Sent follow-up email regarding contract renewal",
+    "timestamp": "2024-01-20T14:45:00Z"
+  },
+  {
+    "Id": 2,
+    "contactId": 1,
+    "type": "call",
+    "description": "30-minute discovery call to discuss expansion opportunities",
+    "timestamp": "2024-01-18T10:30:00Z"
+  },
+  {
+    "Id": 3,
+    "contactId": 2,
+    "type": "meeting",
+    "description": "Scheduled product demo for next Tuesday",
+    "timestamp": "2024-01-22T11:30:00Z"
+  },
+  {
+    "Id": 4,
+    "contactId": 2,
+    "type": "email",
+    "description": "Sent pricing information and implementation timeline",
+    "timestamp": "2024-01-21T09:15:00Z"
+  },
+  {
+    "Id": 5,
+    "contactId": 3,
+    "type": "download",
+    "description": "Downloaded 'CRM Best Practices' whitepaper",
+    "timestamp": "2024-01-22T16:20:00Z"
+  },
+  {
+    "Id": 6,
+    "contactId": 4,
+    "type": "call",
+    "description": "Check-in call - discussed Q1 marketing campaign",
+    "timestamp": "2024-01-25T13:15:00Z"
+  },
+  {
+    "Id": 7,
+    "contactId": 4,
+    "type": "referral",
+    "description": "Referred Design Plus Agency - sent introduction email",
+    "timestamp": "2024-01-23T16:45:00Z"
+  },
+  {
+    "Id": 8,
+    "contactId": 5,
+    "type": "email",
+    "description": "Sent integration requirements document",
+    "timestamp": "2024-01-24T09:45:00Z"
+  },
+  {
+    "Id": 9,
+    "contactId": 5,
+    "type": "meeting",
+    "description": "Technical requirements meeting with IT team",
+    "timestamp": "2024-01-23T14:30:00Z"
+  },
+  {
+    "Id": 10,
+    "contactId": 6,
+    "type": "webinar",
+    "description": "Attended 'Modern CRM Strategies' webinar",
+    "timestamp": "2024-01-25T14:10:00Z"
+  },
+  {
+    "Id": 11,
+    "contactId": 7,
+    "type": "support",
+    "description": "Resolved login issue for department managers",
+    "timestamp": "2024-01-28T10:30:00Z"
+  },
+  {
+    "Id": 12,
+    "contactId": 7,
+    "type": "training",
+    "description": "Conducted user training session for new hires",
+    "timestamp": "2024-01-26T15:00:00Z"
+  },
+  {
+    "Id": 13,
+    "contactId": 8,
+    "type": "email",
+    "description": "Sent compliance documentation and security whitepaper",
+    "timestamp": "2024-01-26T16:20:00Z"
+  },
+  {
+    "Id": 14,
+    "contactId": 8,
+    "type": "call",
+    "description": "Security review call with compliance team",
+    "timestamp": "2024-01-25T11:00:00Z"
+  },
+  {
+    "Id": 15,
+    "contactId": 10,
+    "type": "call",
+    "description": "Monthly check-in - discussed enrollment metrics",
+    "timestamp": "2024-01-29T14:15:00Z"
+  }
+]

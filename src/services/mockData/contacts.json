@@ -1,0 +1,122 @@
+[
+  {
+    "Id": 1,
+    "firstName": "John",
+    "lastName": "Smith",
+    "email": "john.smith@techinnovate.com",
+    "phone": "+1 (555) 123-4567",
+    "companyId": 1,
+    "lifecycleStage": "Customer",
+    "createdAt": "2024-01-15T10:30:00Z",
+    "updatedAt": "2024-01-20T14:45:00Z",
+    "notes": "Primary contact for the TechInnovate account. Very responsive and interested in expanding their current package."
+  },
+  {
+    "Id": 2,
+    "firstName": "Sarah",
+    "lastName": "Johnson",
+    "email": "sarah.johnson@globalcorp.com",
+    "phone": "+1 (555) 987-6543",
+    "companyId": 2,
+    "lifecycleStage": "Prospect",
+    "createdAt": "2024-01-18T09:15:00Z",
+    "updatedAt": "2024-01-22T11:30:00Z",
+    "notes": "Interested in our enterprise solution. Scheduled for a demo next week. Decision maker for the GlobalCorp procurement team."
+  },
+  {
+    "Id": 3,
+    "firstName": "Michael",
+    "lastName": "Chen",
+    "email": "m.chen@startuphub.io",
+    "phone": "+1 (555) 456-7890",
+    "companyId": 3,
+    "lifecycleStage": "Lead",
+    "createdAt": "2024-01-22T16:20:00Z",
+    "updatedAt": "2024-01-22T16:20:00Z",
+    "notes": "Downloaded our whitepaper. Founder of a growing startup, potential good fit for our growth plan."
+  },
+  {
+    "Id": 4,
+    "firstName": "Emily",
+    "lastName": "Rodriguez",
+    "email": "emily.r@creativestudio.com",
+    "phone": "+1 (555) 234-5678",
+    "companyId": 4,
+    "lifecycleStage": "Customer",
+    "createdAt": "2024-01-10T08:45:00Z",
+    "updatedAt": "2024-01-25T13:15:00Z",
+    "notes": "Long-term customer, very satisfied with our service. Referred two other agencies to us last quarter."
+  },
+  {
+    "Id": 5,
+    "firstName": "David",
+    "lastName": "Wilson",
+    "email": "david.wilson@retailplus.com",
+    "phone": "+1 (555) 345-6789",
+    "companyId": 5,
+    "lifecycleStage": "Prospect",
+    "createdAt": "2024-01-20T12:30:00Z",
+    "updatedAt": "2024-01-24T09:45:00Z",
+    "notes": "Operations manager evaluating our solution for their retail chain. Needs integration with their existing POS system."
+  },
+  {
+    "Id": 6,
+    "firstName": "Lisa",
+    "lastName": "Thompson",
+    "email": "l.thompson@consulting.biz",
+    "phone": "+1 (555) 678-9012",
+    "companyId": 6,
+    "lifecycleStage": "Lead",
+    "createdAt": "2024-01-25T14:10:00Z",
+    "updatedAt": "2024-01-25T14:10:00Z",
+    "notes": "Attended our webinar last week. Consultant looking for tools to help her clients with CRM implementation."
+  },
+  {
+    "Id": 7,
+    "firstName": "James",
+    "lastName": "Anderson",
+    "email": "james.anderson@healthsys.org",
+    "phone": "+1 (555) 789-0123",
+    "companyId": 7,
+    "lifecycleStage": "Customer",
+    "createdAt": "2024-01-05T11:20:00Z",
+    "updatedAt": "2024-01-28T10:30:00Z",
+    "notes": "IT Director at HealthSystem. Implemented our solution across 3 departments. Very technical and detail-oriented."
+  },
+  {
+    "Id": 8,
+    "firstName": "Maria",
+    "lastName": "Garcia",
+    "email": "maria.garcia@financegroup.com",
+    "phone": "+1 (555) 890-1234",
+    "companyId": 8,
+    "lifecycleStage": "Prospect",
+    "createdAt": "2024-01-23T13:45:00Z",
+    "updatedAt": "2024-01-26T16:20:00Z",
+    "notes": "Compliance officer interested in our security features. Needs GDPR and SOX compliance documentation."
+  },
+  {
+    "Id": 9,
+    "firstName": "Robert",
+    "lastName": "Taylor",
+    "email": "rob.taylor@manufacturecorp.com",
+    "phone": "+1 (555) 012-3456",
+    "companyId": 9,
+    "lifecycleStage": "Lead",
+    "createdAt": "2024-01-26T15:30:00Z",
+    "updatedAt": "2024-01-26T15:30:00Z",
+    "notes": "Production manager exploring CRM solutions for their sales team. Large manufacturing company with complex needs."
+  },
+  {
+    "Id": 10,
+    "firstName": "Jennifer",
+    "lastName": "Lee",
+    "email": "jennifer.lee@edutech.edu",
+    "phone": "+1 (555) 123-7890",
+    "companyId": 10,
+    "lifecycleStage": "Customer",
+    "createdAt": "2024-01-12T09:00:00Z",
+    "updatedAt": "2024-01-29T14:15:00Z",
+    "notes": "University administrator managing student recruitment. Uses our system to track prospective students and enrollment pipeline."
+  }
+]

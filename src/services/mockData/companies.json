@@ -1,0 +1,72 @@
+[
+  {
+    "Id": 1,
+    "name": "TechInnovate Solutions",
+    "industry": "Technology",
+    "website": "https://techinnovate.com",
+    "employeeCount": 250
+  },
+  {
+    "Id": 2,
+    "name": "GlobalCorp Industries",
+    "industry": "Manufacturing",
+    "website": "https://globalcorp.com",
+    "employeeCount": 1200
+  },
+  {
+    "Id": 3,
+    "name": "StartupHub Inc",
+    "industry": "Technology",
+    "website": "https://startuphub.io",
+    "employeeCount": 45
+  },
+  {
+    "Id": 4,
+    "name": "Creative Studio Agency",
+    "industry": "Marketing",
+    "website": "https://creativestudio.com",
+    "employeeCount": 85
+  },
+  {
+    "Id": 5,
+    "name": "RetailPlus Chain",
+    "industry": "Retail",
+    "website": "https://retailplus.com",
+    "employeeCount": 500
+  },
+  {
+    "Id": 6,
+    "name": "Business Consulting Group",
+    "industry": "Consulting",
+    "website": "https://consulting.biz",
+    "employeeCount": 150
+  },
+  {
+    "Id": 7,
+    "name": "HealthSystem Medical",
+    "industry": "Healthcare",
+    "website": "https://healthsys.org",
+    "employeeCount": 800
+  },
+  {
+    "Id": 8,
+    "name": "Finance Group Ltd",
+    "industry": "Financial Services",
+    "website": "https://financegroup.com",
+    "employeeCount": 300
+  },
+  {
+    "Id": 9,
+    "name": "ManufactureCorp",
+    "industry": "Manufacturing",
+    "website": "https://manufacturecorp.com",
+    "employeeCount": 2000
+  },
+  {
+    "Id": 10,
+    "name": "EduTech University",
+    "industry": "Education",
+    "website": "https://edutech.edu",
+    "employeeCount": 1500
+  }
+]
