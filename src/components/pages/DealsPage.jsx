@@ -4,6 +4,7 @@ import Header from "@/components/organisms/Header";
 import KanbanBoard from "@/components/organisms/KanbanBoard";
 import DealModal from "@/components/organisms/DealModal";
 import DealForm from "@/components/organisms/DealForm";
+import ActivityForm from "@/components/organisms/ActivityForm";
 import Loading from "@/components/ui/Loading";
 import Error from "@/components/ui/Error";
 import * as dealService from "@/services/api/dealService";
@@ -12,7 +13,7 @@ import * as companyService from "@/services/api/companyService";
 import * as activityService from "@/services/api/activityService";
 
 const DealsPage = ({ onMobileMenuToggle }) => {
-  const [deals, setDeals] = useState([]);
+const [deals, setDeals] = useState([]);
   const [contacts, setContacts] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [activities, setActivities] = useState([]);
@@ -22,7 +23,8 @@ const DealsPage = ({ onMobileMenuToggle }) => {
   const [showDealForm, setShowDealForm] = useState(false);
   const [editingDeal, setEditingDeal] = useState(null);
   const [formLoading, setFormLoading] = useState(false);
-
+  const [showActivityForm, setShowActivityForm] = useState(false);
+  const [editingActivity, setEditingActivity] = useState(null);
   useEffect(() => {
     loadData();
   }, []);
@@ -137,7 +139,52 @@ const DealsPage = ({ onMobileMenuToggle }) => {
       toast.error('Failed to delete deal');
     }
   };
+function handleCreateActivity(dealId = null) {
+    setEditingActivity(null);
+    setShowActivityForm(true);
+    if (dealId) {
+      setSelectedDeal(deals.find(d => d.Id === dealId));
+    }
+  }
 
+  function handleEditActivity(activity) {
+    setEditingActivity(activity);
+    setShowActivityForm(true);
+  }
+
+  async function handleSaveActivity(formData) {
+    setFormLoading(true);
+    try {
+      let savedActivity;
+      if (editingActivity) {
+        savedActivity = await activityService.update(editingActivity.Id, formData);
+        setActivities(prev => prev.map(a => a.Id === editingActivity.Id ? savedActivity : a));
+        toast.success("Activity updated successfully");
+      } else {
+        savedActivity = await activityService.create(formData);
+        setActivities(prev => [...prev, savedActivity]);
+        toast.success("Activity created successfully");
+      }
+      setShowActivityForm(false);
+      setEditingActivity(null);
+    } catch (error) {
+      console.error("Error saving activity:", error);
+      toast.error(`Failed to ${editingActivity ? 'update' : 'create'} activity`);
+    } finally {
+      setFormLoading(false);
+    }
+  }
+
+  async function handleDeleteActivity(activityId) {
+    try {
+      await activityService.delete_(activityId);
+      setActivities(prev => prev.filter(a => a.Id !== activityId));
+      toast.success("Activity deleted successfully");
+    } catch (error) {
+      console.error("Error deleting activity:", error);
+      toast.error("Failed to delete activity");
+    }
+  }
   const getContactById = (contactId) => {
     return contacts.find(contact => contact.Id === contactId);
   };
@@ -168,7 +215,7 @@ const DealsPage = ({ onMobileMenuToggle }) => {
         />
       </div>
 
-      {selectedDeal && (
+{selectedDeal && (
         <DealModal
           deal={selectedDeal}
           contact={getContactById(selectedDeal.contactId)}
@@ -177,6 +224,9 @@ const DealsPage = ({ onMobileMenuToggle }) => {
           onClose={() => setSelectedDeal(null)}
           onEdit={() => handleEditDeal(selectedDeal)}
           onDelete={handleDeleteDeal}
+          onCreateActivity={() => handleCreateActivity(selectedDeal.Id)}
+          onEditActivity={handleEditActivity}
+          onDeleteActivity={handleDeleteActivity}
         />
       )}
 
@@ -191,6 +241,21 @@ const DealsPage = ({ onMobileMenuToggle }) => {
             setEditingDeal(null);
           }}
           loading={formLoading}
+        />
+)}
+
+      {showActivityForm && (
+        <ActivityForm
+          activity={editingActivity}
+          contacts={contacts}
+          deals={deals}
+          onSave={handleSaveActivity}
+          onCancel={() => {
+            setShowActivityForm(false);
+            setEditingActivity(null);
+          }}
+          loading={formLoading}
+          preselectedDealId={selectedDeal?.Id}
         />
       )}
     </div>

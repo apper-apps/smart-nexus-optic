@@ -33,7 +33,18 @@ export const create = async (activityData) => {
     Id: maxId + 1,
     contactId: activityData.contactId ? parseInt(activityData.contactId) : null,
     dealId: activityData.dealId ? parseInt(activityData.dealId) : null,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    // Ensure specific fields are properly handled
+    attendees: activityData.attendees || "",
+    followUpActions: activityData.followUpActions || "",
+    followUpDate: activityData.followUpDate || null,
+    priority: activityData.priority || "medium",
+    location: activityData.location || "",
+    notes: activityData.notes || "",
+    outcome: activityData.outcome || "",
+    duration: activityData.duration ? parseInt(activityData.duration) : null
   };
   
   activities.push(newActivity);

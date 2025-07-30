@@ -1,21 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import Header from "@/components/organisms/Header";
-import ContactsTable from "@/components/organisms/ContactsTable";
-import ContactModal from "@/components/organisms/ContactModal";
-import ContactForm from "@/components/organisms/ContactForm";
-import ContactFilters from "@/components/organisms/ContactFilters";
+import ActivityForm from "@/components/organisms/ActivityForm";
+import * as contactService from "@/services/api/contactService";
+import * as companyService from "@/services/api/companyService";
+import * as dealService from "@/services/api/dealService";
+import * as activityService from "@/services/api/activityService";
 import ActionButton from "@/components/molecules/ActionButton";
+import ContactFilters from "@/components/organisms/ContactFilters";
+import ContactsTable from "@/components/organisms/ContactsTable";
+import Header from "@/components/organisms/Header";
+import ContactForm from "@/components/organisms/ContactForm";
+import ContactModal from "@/components/organisms/ContactModal";
 import Loading from "@/components/ui/Loading";
 import Error from "@/components/ui/Error";
 import Empty from "@/components/ui/Empty";
-import * as contactService from "@/services/api/contactService";
-import * as companyService from "@/services/api/companyService";
-import * as activityService from "@/services/api/activityService";
-
 const ContactsPage = ({ onMobileMenuToggle }) => {
 const [contacts, setContacts] = useState([]);
   const [companies, setCompanies] = useState([]);
+  const [deals, setDeals] = useState([]);
   const [activities, setActivities] = useState([]);
   const [filteredContacts, setFilteredContacts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,7 +28,8 @@ const [contacts, setContacts] = useState([]);
   const [showContactModal, setShowContactModal] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
   const [editingContact, setEditingContact] = useState(null);
-
+  const [showActivityForm, setShowActivityForm] = useState(false);
+  const [editingActivity, setEditingActivity] = useState(null);
   // Filter and search states
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState({
@@ -252,7 +255,51 @@ const handleSearchChange = (e) => {
     } catch (error) {
       toast.error("Failed to update contacts. Please try again.");
     }
-  };
+};
+
+  function handleCreateActivity(contactId = null) {
+    setEditingActivity(null);
+    setShowActivityForm(true);
+    if (contactId) {
+      setSelectedContact(contacts.find(c => c.Id === contactId));
+    }
+  }
+
+  function handleEditActivity(activity) {
+    setEditingActivity(activity);
+    setShowActivityForm(true);
+  }
+
+  async function handleSaveActivity(formData) {
+    try {
+      let savedActivity;
+      if (editingActivity) {
+        savedActivity = await activityService.update(editingActivity.Id, formData);
+        setActivities(prev => prev.map(a => a.Id === editingActivity.Id ? savedActivity : a));
+        toast.success("Activity updated successfully");
+      } else {
+        savedActivity = await activityService.create(formData);
+        setActivities(prev => [...prev, savedActivity]);
+        toast.success("Activity created successfully");
+      }
+      setShowActivityForm(false);
+      setEditingActivity(null);
+    } catch (error) {
+      console.error("Error saving activity:", error);
+      toast.error(`Failed to ${editingActivity ? 'update' : 'create'} activity`);
+    }
+  }
+
+  async function handleDeleteActivity(activityId) {
+    try {
+      await activityService.delete_(activityId);
+      setActivities(prev => prev.filter(a => a.Id !== activityId));
+      toast.success("Activity deleted successfully");
+    } catch (error) {
+      console.error("Error deleting activity:", error);
+      toast.error("Failed to delete activity");
+    }
+  }
   if (loading) {
     return (
       <div className="flex-1 flex flex-col">
@@ -404,7 +451,7 @@ const handleSearchChange = (e) => {
 
       {/* Modals */}
       {showContactModal && selectedContact && (
-        <ContactModal
+<ContactModal
           contact={selectedContact}
           companies={companies}
           activities={activities}
@@ -413,6 +460,9 @@ const handleSearchChange = (e) => {
             setSelectedContact(null);
           }}
           onEdit={handleEditContact}
+          onCreateActivity={() => handleCreateActivity(selectedContact.Id)}
+          onEditActivity={handleEditActivity}
+          onDeleteActivity={handleDeleteActivity}
         />
       )}
 
@@ -425,6 +475,20 @@ const handleSearchChange = (e) => {
             setShowContactForm(false);
             setEditingContact(null);
           }}
+/>
+      )}
+
+      {showActivityForm && (
+        <ActivityForm
+          activity={editingActivity}
+          contacts={contacts}
+          deals={deals}
+          onSave={handleSaveActivity}
+          onCancel={() => {
+            setShowActivityForm(false);
+            setEditingActivity(null);
+          }}
+          preselectedContactId={selectedContact?.Id}
         />
       )}
     </div>
