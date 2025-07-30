@@ -66,4 +66,3 @@ export const delete_ = async (id) => {
   return true;
 };
 // Export delete_ function (delete is a reserved keyword)
-export { delete_ };
