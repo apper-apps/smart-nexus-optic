@@ -26,17 +26,16 @@ export const create = async (companyData) => {
   const newCompany = {
     ...companyData,
     Id: maxId + 1,
-    employeeCount: parseInt(companyData.employeeCount) || 0
+    employeeCount: parseInt(companyData.employeeCount) || 0,
+    customProperties: companyData.customProperties || {}
   };
   
   companies.push(newCompany);
   return { ...newCompany };
 };
-
 export const update = async (id, companyData) => {
   await delay(400);
-  
-  const index = companies.findIndex(c => c.Id === parseInt(id));
+const index = companies.findIndex(c => c.Id === parseInt(id));
   if (index === -1) {
     throw new Error("Company not found");
   }
@@ -44,7 +43,11 @@ export const update = async (id, companyData) => {
   const updatedCompany = {
     ...companies[index],
     ...companyData,
-    employeeCount: parseInt(companyData.employeeCount) || 0
+    employeeCount: parseInt(companyData.employeeCount) || 0,
+    customProperties: {
+      ...companies[index].customProperties,
+      ...companyData.customProperties
+    }
   };
   
   companies[index] = updatedCompany;

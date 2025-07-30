@@ -5,8 +5,10 @@ import Card from "@/components/atoms/Card";
 import Button from "@/components/atoms/Button";
 import Input from "@/components/atoms/Input";
 import Select from "@/components/atoms/Select";
-
+import CustomPropertyFields from "@/components/organisms/CustomPropertyFields";
+import { useCustomProperties } from "@/contexts/CustomPropertyContext";
 const ContactForm = ({ contact, companies = [], onSave, onClose }) => {
+const { contactProperties } = useCustomProperties();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -16,11 +18,12 @@ const ContactForm = ({ contact, companies = [], onSave, onClose }) => {
     lifecycleStage: "Lead",
     notes: ""
   });
+  const [customPropertyValues, setCustomPropertyValues] = useState({});
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
+useEffect(() => {
     if (contact) {
       setFormData({
         firstName: contact.firstName || "",
@@ -31,6 +34,7 @@ const ContactForm = ({ contact, companies = [], onSave, onClose }) => {
         lifecycleStage: contact.lifecycleStage || "Lead",
         notes: contact.notes || ""
       });
+      setCustomPropertyValues(contact.customProperties || {});
     }
   }, [contact]);
 
@@ -74,7 +78,7 @@ const ContactForm = ({ contact, companies = [], onSave, onClose }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -85,7 +89,11 @@ const ContactForm = ({ contact, companies = [], onSave, onClose }) => {
     setIsSubmitting(true);
 
     try {
-      await onSave(formData);
+      const contactData = {
+        ...formData,
+        customProperties: customPropertyValues
+      };
+      await onSave(contactData);
       toast.success(contact ? "Contact updated successfully!" : "Contact created successfully!");
       onClose();
     } catch (error) {
@@ -95,7 +103,7 @@ const ContactForm = ({ contact, companies = [], onSave, onClose }) => {
     }
   };
 
-  const handleChange = (e) => {
+const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -109,6 +117,13 @@ const ContactForm = ({ contact, companies = [], onSave, onClose }) => {
         [name]: ""
       }));
     }
+  };
+
+  const handleCustomPropertyChange = (propertyName, value) => {
+    setCustomPropertyValues(prev => ({
+      ...prev,
+      [propertyName]: value
+    }));
   };
 
   const lifecycleOptions = [
@@ -243,7 +258,15 @@ const ContactForm = ({ contact, companies = [], onSave, onClose }) => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200"
                 placeholder="Add any additional notes about this contact..."
               />
-            </div>
+</div>
+
+            {/* Custom Properties */}
+            <CustomPropertyFields
+              properties={contactProperties}
+              values={customPropertyValues}
+              onChange={handleCustomPropertyChange}
+              errors={errors}
+            />
 
             {/* Actions */}
             <div className="flex items-center justify-end space-x-3 pt-6 border-t border-gray-200">

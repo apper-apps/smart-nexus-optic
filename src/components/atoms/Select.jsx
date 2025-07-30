@@ -6,6 +6,7 @@ const Select = forwardRef(({
   error,
   children,
   className,
+  required,
   ...props 
 }, ref) => {
   const selectStyles = "w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200 bg-white";
@@ -16,11 +17,13 @@ const Select = forwardRef(({
       {label && (
         <label className="block text-sm font-medium text-gray-700 mb-1">
           {label}
+          {required && <span className="text-error-500 ml-1">*</span>}
         </label>
       )}
       <select
         ref={ref}
         className={cn(selectStyles, errorStyles, className)}
+        required={required}
         {...props}
       >
         {children}

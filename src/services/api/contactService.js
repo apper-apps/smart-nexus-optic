@@ -20,13 +20,14 @@ export const getById = async (id) => {
 };
 
 export const create = async (contactData) => {
-  await delay(400);
+await delay(400);
   
   const maxId = Math.max(...contacts.map(c => c.Id), 0);
   const newContact = {
     ...contactData,
     Id: maxId + 1,
     companyId: contactData.companyId ? parseInt(contactData.companyId) : null,
+    customProperties: contactData.customProperties || {},
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
@@ -36,7 +37,7 @@ export const create = async (contactData) => {
 };
 
 export const update = async (id, contactData) => {
-  await delay(400);
+await delay(400);
   
   const index = contacts.findIndex(c => c.Id === parseInt(id));
   if (index === -1) {
@@ -47,6 +48,10 @@ export const update = async (id, contactData) => {
     ...contacts[index],
     ...contactData,
     companyId: contactData.companyId ? parseInt(contactData.companyId) : null,
+    customProperties: {
+      ...contacts[index].customProperties,
+      ...contactData.customProperties
+    },
     updatedAt: new Date().toISOString()
   };
   
