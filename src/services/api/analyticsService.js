@@ -4,13 +4,47 @@ import { getAll as getAllDeals, DEAL_STAGES } from './dealService';
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Calculate analytics from existing data
-export const getAnalytics = async () => {
+export const getAnalytics = async (filters = {}) => {
   await delay(200);
   
-  const [contacts, deals] = await Promise.all([
+  const [allContacts, allDeals] = await Promise.all([
     getAllContacts(),
     getAllDeals()
   ]);
+
+  // Apply filters
+  let contacts = [...allContacts];
+  let deals = [...allDeals];
+
+  // Filter by date range
+  if (filters.dateFrom || filters.dateTo) {
+    const fromDate = filters.dateFrom ? new Date(filters.dateFrom) : null;
+    const toDate = filters.dateTo ? new Date(filters.dateTo) : null;
+    
+    contacts = contacts.filter(contact => {
+      const contactDate = new Date(contact.createdAt);
+      if (fromDate && contactDate < fromDate) return false;
+      if (toDate && contactDate > toDate) return false;
+      return true;
+    });
+    
+    deals = deals.filter(deal => {
+      const dealDate = new Date(deal.createdAt);
+      if (fromDate && dealDate < fromDate) return false;
+      if (toDate && dealDate > toDate) return false;
+      return true;
+    });
+  }
+
+  // Filter by team member (assignedTo for deals)
+  if (filters.teamMember) {
+    deals = deals.filter(deal => deal.assignedTo === filters.teamMember);
+  }
+
+  // Filter by lifecycle stage
+  if (filters.lifecycleStage) {
+    contacts = contacts.filter(contact => contact.lifecycleStage === filters.lifecycleStage);
+  }
 
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
@@ -83,9 +117,26 @@ export const getAnalytics = async () => {
 };
 
 // Get contact lifecycle distribution
-export const getContactLifecycleStats = async () => {
+export const getContactLifecycleStats = async (filters = {}) => {
   await delay(200);
-  const contacts = await getAllContacts();
+  let contacts = await getAllContacts();
+
+  // Apply filters
+  if (filters.dateFrom || filters.dateTo) {
+    const fromDate = filters.dateFrom ? new Date(filters.dateFrom) : null;
+    const toDate = filters.dateTo ? new Date(filters.dateTo) : null;
+    
+    contacts = contacts.filter(contact => {
+      const contactDate = new Date(contact.createdAt);
+      if (fromDate && contactDate < fromDate) return false;
+      if (toDate && contactDate > toDate) return false;
+      return true;
+    });
+  }
+
+  if (filters.lifecycleStage) {
+    contacts = contacts.filter(contact => contact.lifecycleStage === filters.lifecycleStage);
+  }
   
   const lifecycleStats = contacts.reduce((acc, contact) => {
     const stage = contact.lifecycleStage || 'Unknown';
@@ -101,9 +152,26 @@ export const getContactLifecycleStats = async () => {
 };
 
 // Get lead source statistics
-export const getLeadSourceStats = async () => {
+export const getLeadSourceStats = async (filters = {}) => {
   await delay(200);
-  const contacts = await getAllContacts();
+  let contacts = await getAllContacts();
+
+  // Apply filters
+  if (filters.dateFrom || filters.dateTo) {
+    const fromDate = filters.dateFrom ? new Date(filters.dateFrom) : null;
+    const toDate = filters.dateTo ? new Date(filters.dateTo) : null;
+    
+    contacts = contacts.filter(contact => {
+      const contactDate = new Date(contact.createdAt);
+      if (fromDate && contactDate < fromDate) return false;
+      if (toDate && contactDate > toDate) return false;
+      return true;
+    });
+  }
+
+  if (filters.lifecycleStage) {
+    contacts = contacts.filter(contact => contact.lifecycleStage === filters.lifecycleStage);
+  }
   
   const leadSources = contacts.reduce((acc, contact) => {
     const source = contact.source || 'Unknown';
@@ -119,9 +187,26 @@ export const getLeadSourceStats = async () => {
 };
 
 // Get sales rep performance
-export const getSalesRepPerformance = async () => {
+export const getSalesRepPerformance = async (filters = {}) => {
   await delay(200);
-  const deals = await getAllDeals();
+  let deals = await getAllDeals();
+
+  // Apply filters
+  if (filters.dateFrom || filters.dateTo) {
+    const fromDate = filters.dateFrom ? new Date(filters.dateFrom) : null;
+    const toDate = filters.dateTo ? new Date(filters.dateTo) : null;
+    
+    deals = deals.filter(deal => {
+      const dealDate = new Date(deal.createdAt);
+      if (fromDate && dealDate < fromDate) return false;
+      if (toDate && dealDate > toDate) return false;
+      return true;
+    });
+  }
+
+  if (filters.teamMember) {
+    deals = deals.filter(deal => deal.assignedTo === filters.teamMember);
+  }
   
   const repPerformance = deals.reduce((acc, deal) => {
     const rep = deal.assignedTo || 'Unassigned';
@@ -152,14 +237,26 @@ export const getSalesRepPerformance = async () => {
 };
 
 // Get campaign performance from campaign service
-export const getCampaignPerformance = async () => {
+export const getCampaignPerformance = async (filters = {}) => {
   await delay(200);
   
   try {
     // Import campaign service dynamically to avoid circular imports
-    const { campaignService } = await import('./campaignService');
-    const campaigns = await campaignService.getAll();
+const { campaignService } = await import('./campaignService');
+    let campaigns = await campaignService.getAll();
     
+    // Apply date filters to campaigns
+    if (filters.dateFrom || filters.dateTo) {
+      const fromDate = filters.dateFrom ? new Date(filters.dateFrom) : null;
+      const toDate = filters.dateTo ? new Date(filters.dateTo) : null;
+      
+      campaigns = campaigns.filter(campaign => {
+        const campaignDate = new Date(campaign.createdAt || campaign.scheduledDate);
+        if (fromDate && campaignDate < fromDate) return false;
+        if (toDate && campaignDate > toDate) return false;
+        return true;
+      });
+    }
     const totalCampaigns = campaigns.length;
     const activeCampaigns = campaigns.filter(c => c.status === 'active').length;
     const draftCampaigns = campaigns.filter(c => c.status === 'draft').length;

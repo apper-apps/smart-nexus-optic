@@ -3,6 +3,9 @@ import Header from "@/components/organisms/Header";
 import Card from "@/components/atoms/Card";
 import ApperIcon from "@/components/ApperIcon";
 import Loading from "@/components/ui/Loading";
+import Input from "@/components/atoms/Input";
+import Select from "@/components/atoms/Select";
+import Button from "@/components/atoms/Button";
 import { getAnalytics, getContactLifecycleStats, getLeadSourceStats, getSalesRepPerformance, getCampaignPerformance } from "@/services/api/analyticsService";
 import { toast } from "react-toastify";
 import Chart from "react-apexcharts";
@@ -75,17 +78,25 @@ const [analytics, setAnalytics] = useState(null);
   const [campaignPerformance, setCampaignPerformance] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Filter states
+  const [filters, setFilters] = useState({
+    dateFrom: '',
+    dateTo: '',
+    teamMember: '',
+    lifecycleStage: ''
+  });
 
-  useEffect(() => {
+useEffect(() => {
     const loadAnalytics = async () => {
       try {
         setLoading(true);
         const [analyticsData, lifecycleData, leadSourceData, salesRepData, campaignData] = await Promise.all([
-          getAnalytics(),
-          getContactLifecycleStats(),
-          getLeadSourceStats(),
-          getSalesRepPerformance(),
-          getCampaignPerformance()
+          getAnalytics(filters),
+          getContactLifecycleStats(filters),
+          getLeadSourceStats(filters),
+          getSalesRepPerformance(filters),
+          getCampaignPerformance(filters)
         ]);
         setAnalytics(analyticsData);
         setLifecycleStats(lifecycleData);
@@ -103,7 +114,102 @@ const [analytics, setAnalytics] = useState(null);
     };
 
     loadAnalytics();
-  }, []);
+  }, [filters]);
+
+  const handleFilterChange = (key, value) => {
+    setFilters(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
+  const resetFilters = () => {
+    setFilters({
+      dateFrom: '',
+      dateTo: '',
+      teamMember: '',
+      lifecycleStage: ''
+    });
+    toast.success('Filters reset successfully');
+  };
+
+  const FilterSection = () => (
+    <Card className="p-6 mb-6">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-gray-900">Report Filters</h3>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={resetFilters}
+          className="flex items-center gap-2"
+        >
+          <ApperIcon name="RotateCcw" size={16} />
+          Reset Filters
+        </Button>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Date From
+          </label>
+          <Input
+            type="date"
+            value={filters.dateFrom}
+            onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
+            className="w-full"
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Date To
+          </label>
+          <Input
+            type="date"
+            value={filters.dateTo}
+            onChange={(e) => handleFilterChange('dateTo', e.target.value)}
+            className="w-full"
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Team Member
+          </label>
+          <Select
+            value={filters.teamMember}
+            onChange={(e) => handleFilterChange('teamMember', e.target.value)}
+            className="w-full"
+          >
+            <option value="">All Team Members</option>
+            <option value="John Smith">John Smith</option>
+            <option value="Sarah Johnson">Sarah Johnson</option>
+            <option value="Mike Chen">Mike Chen</option>
+            <option value="Emily Davis">Emily Davis</option>
+            <option value="Alex Rodriguez">Alex Rodriguez</option>
+          </Select>
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Lifecycle Stage
+          </label>
+          <Select
+            value={filters.lifecycleStage}
+            onChange={(e) => handleFilterChange('lifecycleStage', e.target.value)}
+            className="w-full"
+          >
+            <option value="">All Stages</option>
+            <option value="lead">Lead</option>
+            <option value="prospect">Prospect</option>
+            <option value="customer">Customer</option>
+            <option value="evangelist">Evangelist</option>
+          </Select>
+        </div>
+      </div>
+    </Card>
+  );
 
   if (loading) {
     return (
@@ -170,6 +276,7 @@ return (
       />
 
       <div className="flex-1 p-6 space-y-6">
+        <FilterSection />
         {/* KPI Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
           <MetricCard
