@@ -7,6 +7,7 @@ import DealsPage from "@/components/pages/DealsPage";
 import MarketingPage from "@/components/pages/MarketingPage";
 import ReportsPage from "@/components/pages/ReportsPage";
 import SettingsPage from "@/components/pages/SettingsPage";
+import WorkflowsPage from "@/components/pages/WorkflowsPage";
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -41,9 +42,13 @@ function App() {
               path="/reports" 
               element={<ReportsPage onMobileMenuToggle={handleMobileMenuToggle} />} 
             />
-            <Route 
+<Route 
               path="/settings" 
               element={<SettingsPage onMobileMenuToggle={handleMobileMenuToggle} />} 
+            />
+            <Route 
+              path="/workflows" 
+              element={<WorkflowsPage onMobileMenuToggle={handleMobileMenuToggle} />} 
             />
           </Routes>
         </div>

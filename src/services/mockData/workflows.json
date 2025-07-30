@@ -1,0 +1,340 @@
+[
+  {
+    "Id": 1,
+    "name": "Welcome New Contacts",
+    "description": "Send welcome email to new contacts and create follow-up task",
+    "isActive": true,
+    "trigger": {
+      "type": "contact_created",
+      "config": {}
+    },
+    "actions": [
+      {
+        "type": "send_email",
+        "config": {
+          "subject": "Welcome to our platform!",
+          "template": "welcome"
+        }
+      },
+      {
+        "type": "create_task",
+        "config": {
+          "title": "Follow up with new contact",
+          "priority": "medium"
+        }
+      }
+    ],
+    "nodes": [
+      {
+        "id": "trigger_1",
+        "type": "trigger",
+        "subType": "contact_created",
+        "x": 100,
+        "y": 100,
+        "config": {}
+      },
+      {
+        "id": "action_1",
+        "type": "action",
+        "subType": "send_email",
+        "x": 350,
+        "y": 100,
+        "config": {
+          "subject": "Welcome to our platform!",
+          "template": "welcome"
+        }
+      },
+      {
+        "id": "action_2",
+        "type": "action",
+        "subType": "create_task",
+        "x": 600,
+        "y": 100,
+        "config": {
+          "title": "Follow up with new contact",
+          "priority": "medium"
+        }
+      }
+    ],
+    "connections": [
+      { "from": "trigger_1", "to": "action_1" },
+      { "from": "action_1", "to": "action_2" }
+    ],
+    "executionCount": 45,
+    "successRate": 98.5,
+    "createdAt": "2024-01-15T10:00:00Z",
+    "updatedAt": "2024-01-20T14:30:00Z",
+    "executionHistory": [
+      {
+        "id": 1001,
+        "workflowId": 1,
+        "status": "completed",
+        "startedAt": "2024-01-20T14:00:00Z",
+        "completedAt": "2024-01-20T14:00:05Z",
+        "context": {
+          "contactId": 123,
+          "contactName": "John Doe"
+        },
+        "results": [
+          {
+            "action": "send_email",
+            "status": "success",
+            "message": "Welcome email sent successfully"
+          },
+          {
+            "action": "create_task",
+            "status": "success",
+            "message": "Follow-up task created"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Id": 2,
+    "name": "Email Engagement Follow-up",
+    "description": "Follow up with contacts who opened promotional emails",
+    "isActive": true,
+    "trigger": {
+      "type": "email_opened",
+      "config": {
+        "emailType": "promotional"
+      }
+    },
+    "actions": [
+      {
+        "type": "update_contact",
+        "config": {
+          "property": "score",
+          "value": "+10"
+        }
+      },
+      {
+        "type": "create_task",
+        "config": {
+          "title": "Contact showed interest - follow up",
+          "priority": "high"
+        }
+      }
+    ],
+    "nodes": [
+      {
+        "id": "trigger_2",
+        "type": "trigger",
+        "subType": "email_opened",
+        "x": 100,
+        "y": 100,
+        "config": {
+          "emailType": "promotional"
+        }
+      },
+      {
+        "id": "action_3",
+        "type": "action",
+        "subType": "update_contact",
+        "x": 350,
+        "y": 100,
+        "config": {
+          "property": "score",
+          "value": "+10"
+        }
+      },
+      {
+        "id": "action_4",
+        "type": "action",
+        "subType": "create_task",
+        "x": 600,
+        "y": 100,
+        "config": {
+          "title": "Contact showed interest - follow up",
+          "priority": "high"
+        }
+      }
+    ],
+    "connections": [
+      { "from": "trigger_2", "to": "action_3" },
+      { "from": "action_3", "to": "action_4" }
+    ],
+    "executionCount": 23,
+    "successRate": 100,
+    "createdAt": "2024-01-10T09:00:00Z",
+    "updatedAt": "2024-01-18T16:45:00Z",
+    "executionHistory": []
+  },
+  {
+    "Id": 3,
+    "name": "Deal Stage Progression",
+    "description": "Automatically assign team members and create tasks when deals progress",
+    "isActive": false,
+    "trigger": {
+      "type": "deal_stage_changed",
+      "config": {
+        "stage": "negotiation"
+      }
+    },
+    "actions": [
+      {
+        "type": "assign_team_member",
+        "config": {
+          "assignee": "sarah"
+        }
+      },
+      {
+        "type": "create_task",
+        "config": {
+          "title": "Prepare contract for negotiation",
+          "priority": "high"
+        }
+      },
+      {
+        "type": "send_email",
+        "config": {
+          "subject": "Deal moved to negotiation",
+          "template": "deal_notification"
+        }
+      }
+    ],
+    "nodes": [
+      {
+        "id": "trigger_3",
+        "type": "trigger",
+        "subType": "deal_stage_changed",
+        "x": 100,
+        "y": 100,
+        "config": {
+          "stage": "negotiation"
+        }
+      },
+      {
+        "id": "action_5",
+        "type": "action",
+        "subType": "assign_team_member",
+        "x": 350,
+        "y": 50,
+        "config": {
+          "assignee": "sarah"
+        }
+      },
+      {
+        "id": "action_6",
+        "type": "action",
+        "subType": "create_task",
+        "x": 350,
+        "y": 150,
+        "config": {
+          "title": "Prepare contract for negotiation",
+          "priority": "high"
+        }
+      },
+      {
+        "id": "action_7",
+        "type": "action",
+        "subType": "send_email",
+        "x": 600,
+        "y": 100,
+        "config": {
+          "subject": "Deal moved to negotiation",
+          "template": "deal_notification"
+        }
+      }
+    ],
+    "connections": [
+      { "from": "trigger_3", "to": "action_5" },
+      { "from": "trigger_3", "to": "action_6" },
+      { "from": "action_5", "to": "action_7" },
+      { "from": "action_6", "to": "action_7" }
+    ],
+    "executionCount": 8,
+    "successRate": 87.5,
+    "createdAt": "2024-01-05T11:00:00Z",
+    "updatedAt": "2024-01-15T13:20:00Z",
+    "executionHistory": []
+  },
+  {
+    "Id": 4,
+    "name": "Form Submission Processing",
+    "description": "Process contact form submissions and route to appropriate team",
+    "isActive": true,
+    "trigger": {
+      "type": "form_submitted",
+      "config": {
+        "formName": "contact_form"
+      }
+    },
+    "actions": [
+      {
+        "type": "create_deal",
+        "config": {
+          "stage": "lead",
+          "value": 0
+        }
+      },
+      {
+        "type": "add_to_list",
+        "config": {
+          "listName": "web_leads"
+        }
+      },
+      {
+        "type": "assign_team_member",
+        "config": {
+          "assignee": "john"
+        }
+      }
+    ],
+    "nodes": [
+      {
+        "id": "trigger_4",
+        "type": "trigger",
+        "subType": "form_submitted",
+        "x": 100,
+        "y": 100,
+        "config": {
+          "formName": "contact_form"
+        }
+      },
+      {
+        "id": "action_8",
+        "type": "action",
+        "subType": "create_deal",
+        "x": 350,
+        "y": 50,
+        "config": {
+          "stage": "lead",
+          "value": 0
+        }
+      },
+      {
+        "id": "action_9",
+        "type": "action",
+        "subType": "add_to_list",
+        "x": 350,
+        "y": 150,
+        "config": {
+          "listName": "web_leads"
+        }
+      },
+      {
+        "id": "action_10",
+        "type": "action",
+        "subType": "assign_team_member",
+        "x": 600,
+        "y": 100,
+        "config": {
+          "assignee": "john"
+        }
+      }
+    ],
+    "connections": [
+      { "from": "trigger_4", "to": "action_8" },
+      { "from": "trigger_4", "to": "action_9" },
+      { "from": "action_8", "to": "action_10" },
+      { "from": "action_9", "to": "action_10" }
+    ],
+    "executionCount": 67,
+    "successRate": 95.2,
+    "createdAt": "2024-01-01T08:00:00Z",
+    "updatedAt": "2024-01-22T10:15:00Z",
+    "executionHistory": []
+  }
+]
