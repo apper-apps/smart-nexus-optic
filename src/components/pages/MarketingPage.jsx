@@ -517,9 +517,8 @@ const handleCloseModal = () => {
           <EmailBuilder
             emailContent={formData.emailContent}
             onSave={handleEmailContentSave}
-            onClose={() => setShowEmailBuilder(false)}
+onClose={() => setShowEmailBuilder(false)}
           />
-        )}
         )}
       </div>
     </div>
