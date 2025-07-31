@@ -7,7 +7,6 @@ import Sidebar from "@/components/organisms/Sidebar";
 import ReportsPage from "@/components/pages/ReportsPage";
 import DealsPage from "@/components/pages/DealsPage";
 import SettingsPage from "@/components/pages/SettingsPage";
-import WorkflowsPage from "@/components/pages/WorkflowsPage";
 import MarketingPage from "@/components/pages/MarketingPage";
 import ContactsPage from "@/components/pages/ContactsPage";
 
@@ -48,10 +47,6 @@ return (
               <Route 
                 path="/settings" 
                 element={<SettingsPage onMobileMenuToggle={handleMobileMenuToggle} />} 
-              />
-              <Route 
-                path="/workflows" 
-                element={<WorkflowsPage onMobileMenuToggle={handleMobileMenuToggle} />} 
               />
             </Routes>
           </div>
