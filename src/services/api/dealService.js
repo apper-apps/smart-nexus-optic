@@ -451,22 +451,3 @@ export const getByStage = async (stage) => {
     return [];
   }
 };
-
-// Valid deal stages
-export const DEAL_STAGES = {
-  PROSPECT: 'Prospect',
-  QUALIFIED: 'Qualified', 
-  PROPOSAL: 'Proposal',
-  NEGOTIATION: 'Negotiation',
-  CLOSED_WON: 'Closed Won',
-  CLOSED_LOST: 'Closed Lost'
-};
-
-export const STAGE_ORDER = [
-  DEAL_STAGES.PROSPECT,
-  DEAL_STAGES.QUALIFIED,
-  DEAL_STAGES.PROPOSAL,
-  DEAL_STAGES.NEGOTIATION,
-  DEAL_STAGES.CLOSED_WON,
-  DEAL_STAGES.CLOSED_LOST
-];
